@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marvel Rivals - Sélecteur de Héros</title>
+    <link rel="stylesheet" href="styles.css?v=8">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="hero-header">
+            <h1 class="main-title">MARVEL RIVALS</h1>
+            <p class="subtitle">Marvel Rivals Roulette</p>
+        </header>
+
+        <div class="controls-section">
+            <div class="role-filters">
+                <button class="role-btn active" data-role="all">
+                    <span class="role-text">TOUS</span>
+                </button>
+                <button class="role-btn tank" data-role="tank">
+                    <span class="role-text">TANK</span>
+                </button>
+                <button class="role-btn dps" data-role="dps">
+                    <span class="role-text">DPS</span>
+                </button>
+                <button class="role-btn healer" data-role="healer">
+                    <span class="role-text">HEALER</span>
+                </button>
+            </div>
+
+            <button class="random-btn" id="randomBtn">
+                <span class="btn-text">SÉLECTIONNER UN HÉROS</span>
+            </button>
+        </div>
+
+        <div class="result-section" id="resultSection">
+            <div class="hero-card" id="heroCard">
+                <div class="hero-role-badge" id="heroRoleBadge"></div>
+                <div class="hero-name" id="heroName">Cliquez pour sélectionner un héros !</div>
+                <div class="hero-animation" id="heroAnimation"></div>
+            </div>
+        </div>
+
+        <div class="stats-section">
+            <div class="stat-item">
+                <div class="stat-number" id="tankCount">12</div>
+                <div class="stat-label">Tanks</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="dpsCount">23</div>
+                <div class="stat-label">Dps</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="healerCount">9</div>
+                <div class="stat-label">Healers</div>
+            </div>
+        </div>
+
+        <div class="heroes-grid" id="heroesGrid">
+            <!-- Les cartes de héros seront générées par JavaScript -->
+        </div>
+    </div>
+
+    <script src="script.js?v=8"></script>
+</body>
+</html>

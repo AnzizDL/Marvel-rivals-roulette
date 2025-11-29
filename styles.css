@@ -1,0 +1,481 @@
+/* ============================================
+   COULEURS ET VARIABLES
+   ============================================ */
+:root {
+    /* Couleurs principales - Version sobre */
+    --primary-blue: #2C3E50;        /* Bleu foncé sobre */
+    --primary-green: #16A085;       /* Vert teal sobre */
+    --primary-red: #C0392B;         /* Rouge bordeaux sobre */
+    --primary-gold: #D68910;        /* Orange/or sobre */
+    --primary-purple: #7D3C98;      /* Violet sobre */
+    
+    /* Couleurs de base */
+    --white: #FFFFFF;
+    --light-gray: #F8F9FA;
+    --dark-bg: #1A252F;
+    --card-bg: rgba(52, 73, 94, 0.9);
+    --border-light: #566573;
+    --text-light: #AEB6BF;
+    --overlay: rgba(26, 37, 47, 0.85);
+}
+
+/* ============================================
+   RESET ET BASE
+   ============================================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Exo 2', sans-serif;
+    background: 
+        linear-gradient(var(--overlay), var(--overlay)),
+        url('./Assets/Images/1386592.jpg') center/cover no-repeat fixed,
+        linear-gradient(135deg, var(--dark-bg) 0%, #34495E 100%);
+    color: var(--white);
+    min-height: 100vh;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* ============================================
+   HEADER ET TITRE
+   ============================================ */
+.hero-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.main-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: var(--light-gray);
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    color: var(--text-light);
+    letter-spacing: 2px;
+    font-weight: 300;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* ============================================
+   BOUTONS DE RÔLES
+   ============================================ */
+.controls-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.role-filters {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.role-btn {
+    background: var(--card-bg);
+    border: 2px solid var(--border-light);
+    border-radius: 12px;
+    padding: 15px 25px;
+    color: var(--white);
+    font-family: 'Orbitron', monospace;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.role-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.role-btn.active {
+    border-color: var(--text-light);
+    background: var(--text-light);
+    color: var(--dark-bg);
+}
+
+/* Couleurs spécifiques par rôle */
+.role-btn.tank.active { 
+    border-color: var(--primary-blue); 
+    background: var(--primary-blue);
+}
+
+.role-btn.dps.active { 
+    border-color: var(--primary-red); 
+    background: var(--primary-red);
+}
+
+.role-btn.healer.active { 
+    border-color: var(--primary-green); 
+    background: var(--primary-green);
+}
+
+/* ============================================
+   BOUTON PRINCIPAL DE SÉLECTION
+   ============================================ */
+.random-btn {
+    background: var(--primary-purple);
+    border: none;
+    border-radius: 15px;
+    padding: 18px 35px;
+    color: var(--white);
+    font-family: 'Orbitron', monospace;
+    font-size: 1.3rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.random-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    background: #633974;
+}
+
+.btn-icon {
+    font-size: 1.5rem;
+}
+
+/* ============================================
+   CARTE DU HÉROS SÉLECTIONNÉ
+   ============================================ */
+.result-section {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 40px;
+}
+
+.hero-card {
+    background: var(--card-bg);
+    border: 3px solid var(--border-light);
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+    position: relative;
+    min-width: 400px;
+    min-height: 180px;
+    transition: all 0.5s ease;
+}
+
+.hero-card.active {
+    transform: scale(1.02);
+    border-color: var(--text-light);
+}
+
+.hero-role-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    padding: 8px 15px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.hero-role-badge.show {
+    opacity: 1;
+}
+
+.hero-role-badge.tank {
+    background: var(--primary-blue);
+    color: var(--white);
+}
+
+.hero-role-badge.dps {
+    background: var(--primary-red);
+    color: var(--white);
+}
+
+.hero-role-badge.healer {
+    background: var(--primary-green);
+    color: var(--white);
+}
+
+.hero-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin: 20px 0;
+    color: var(--white);
+}
+
+/* ============================================
+   STATISTIQUES
+   ============================================ */
+.stats-section {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 20px;
+    background: var(--card-bg);
+    border-radius: 12px;
+    border: 2px solid var(--border-light);
+    transition: all 0.3s ease;
+    min-width: 120px;
+}
+
+.stat-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+.stat-number {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--light-gray);
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin-top: 5px;
+    letter-spacing: 1px;
+}
+
+/* ============================================
+   GRILLE DES HÉROS
+   ============================================ */
+.heroes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 40px;
+}
+
+.hero-grid-card {
+    background: var(--card-bg);
+    border: 2px solid var(--border-light);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.hero-grid-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--text-light);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+.hero-grid-card.tank:hover {
+    border-color: var(--primary-blue);
+    box-shadow: 0 6px 15px rgba(44, 62, 80, 0.4);
+}
+
+.hero-grid-card.dps:hover {
+    border-color: var(--primary-red);
+    box-shadow: 0 6px 15px rgba(192, 57, 43, 0.4);
+}
+
+.hero-grid-card.healer:hover {
+    border-color: var(--primary-green);
+    box-shadow: 0 6px 15px rgba(22, 160, 133, 0.4);
+}
+
+.hero-grid-name {
+    font-family: 'Orbitron', monospace;
+    font-weight: 600;
+    color: var(--white);
+    font-size: 1rem;
+    margin-bottom: 10px;
+}
+
+.hero-grid-role {
+    font-size: 0.8rem;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: var(--white);
+}
+
+.hero-grid-role.tank {
+    background: var(--primary-blue);
+}
+
+.hero-grid-role.dps {
+    background: var(--primary-red);
+}
+
+.hero-grid-role.healer {
+    background: var(--primary-green);
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+@media (max-width: 768px) {
+    .main-title {
+        font-size: 2.5rem;
+    }
+    
+    .role-filters {
+        gap: 10px;
+    }
+    
+    .role-btn {
+        padding: 12px 20px;
+        font-size: 0.9rem;
+    }
+    
+    .hero-card {
+        min-width: 300px;
+        padding: 30px;
+    }
+    
+    .hero-name {
+        font-size: 1.8rem;
+    }
+    
+    .stats-section {
+        gap: 20px;
+    }
+    
+    .heroes-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-title {
+        font-size: 2rem;
+    }
+    
+    .hero-card {
+        min-width: 250px;
+        padding: 20px;
+    }
+    
+    .hero-name {
+        font-size: 1.5rem;
+    }
+    
+    .random-btn {
+        padding: 15px 25px;
+        font-size: 1.1rem;
+    }
+    
+    .role-filters {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .role-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ============================================
+   ANIMATIONS DE SUSPENSE
+   ============================================ */
+
+/* Animation pendant la roulette de suspense */
+.suspense-active {
+    animation: suspenseShake 0.1s ease-in-out infinite alternate !important;
+    box-shadow: 0 0 25px rgba(125, 60, 152, 0.4) !important;
+    border-color: var(--primary-purple) !important;
+}
+
+@keyframes suspenseShake {
+    0% { transform: translateY(-1px) scale(1.01); }
+    100% { transform: translateY(1px) scale(0.99); }
+}
+
+/* Flash des noms pendant la roulette */
+.suspense-flash {
+    animation: nameFlash 0.06s ease-in-out !important;
+    color: var(--primary-gold) !important;
+    text-shadow: 0 0 15px rgba(214, 137, 16, 0.8) !important;
+}
+
+@keyframes nameFlash {
+    0%, 100% { 
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% { 
+        transform: scale(1.06);
+        opacity: 0.9;
+    }
+}
+
+/* Suspense final avant révélation */
+.final-suspense {
+    animation: finalSuspense 0.3s ease-in-out !important;
+    box-shadow: 0 0 40px rgba(125, 60, 152, 0.7) !important;
+}
+
+@keyframes finalSuspense {
+    0%, 100% { 
+        transform: scale(1);
+        opacity: 1;
+    }
+    25% { 
+        transform: scale(0.95);
+        opacity: 0.8;
+    }
+    75% { 
+        transform: scale(1.05);
+        opacity: 1;
+    }
+}
+
+/* Révélation finale dramatique */
+.final-reveal {
+    animation: finalReveal 0.6s ease-out !important;
+    box-shadow: 0 0 50px rgba(22, 160, 133, 0.8) !important;
+    border-color: var(--primary-green) !important;
+}
+
+@keyframes finalReveal {
+    0% { 
+        transform: scale(0.9);
+        opacity: 0.6;
+    }
+    50% { 
+        transform: scale(1.15);
+        opacity: 1;
+        box-shadow: 0 0 60px rgba(22, 160, 133, 1);
+    }
+    100% { 
+        transform: scale(1.02);
+        opacity: 1;
+        box-shadow: 0 0 30px rgba(22, 160, 133, 0.6);
+    }
+}
