@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Marvel Rivals - Sélecteur de Héros</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles.css?v=8">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
@@ -28,6 +29,33 @@
                 <button class="role-btn healer" data-role="healer">
                     <span class="role-text">HEALER</span>
                 </button>
+            </div>
+
+            <!-- Barre d'outils paramètres + recherche (Tailwind) -->
+            <div class="w-full mt-4 flex flex-col gap-3">
+                <div class="flex flex-col md:flex-row items-stretch md:items-center gap-3 md:gap-4">
+                    <label class="inline-flex items-center gap-2 bg-[rgba(52,73,94,0.9)] border border-[#566573] text-white rounded-md px-3 py-2">
+                        <input id="noRepeatToggle" type="checkbox" class="h-4 w-4 accent-emerald-500">
+                        <span class="text-sm">Éviter les répétitions</span>
+                    </label>
+
+                    <label class="inline-flex items-center gap-2 bg-[rgba(52,73,94,0.9)] border border-[#566573] text-white rounded-md px-3 py-2">
+                        <span class="text-sm">Vitesse</span>
+                        <select id="speedSelect" class="bg-transparent text-sm focus:outline-none">
+                            <option value="fast">Rapide</option>
+                            <option value="normal" selected>Normal</option>
+                            <option value="slow">Lent</option>
+                        </select>
+                    </label>
+
+                    <button id="resetHistoryBtn" class="ml-0 md:ml-auto bg-[#7D3C98] hover:bg-[#633974] text-white rounded-md px-4 py-2 text-sm transition">
+                        Réinitialiser l'historique
+                    </button>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <input id="searchInput" type="text" placeholder="Rechercher un héros..." class="w-full md:w-1/2 bg-[rgba(52,73,94,0.9)] border border-[#566573] text-white rounded-md px-3 py-2 focus:outline-none" />
+                </div>
             </div>
 
             <button class="random-btn" id="randomBtn">
@@ -57,6 +85,12 @@
                 <div class="stat-label">Healers</div>
             </div>
         </div>
+
+        <!-- Historique des derniers tirages (Tailwind) -->
+        <section class="max-w-5xl mx-auto w-full mt-6">
+            <h2 class="text-sm tracking-widest text-[#AEB6BF] uppercase mb-2 pl-1">Historique</h2>
+            <div id="historyList" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2"></div>
+        </section>
 
         <div class="heroes-grid" id="heroesGrid">
             <!-- Les cartes de héros seront générées par JavaScript -->

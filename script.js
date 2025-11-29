@@ -83,6 +83,22 @@ const roleConfig = {
 let currentFilter = 'all';    // Filtre actuel (all, tank, dps, healer)
 let isAnimating = false;       // Empêche les clics multiples pendant l'animation
 
+// Paramètres et état étendus
+let settings = {
+    noRepeat: false,
+    speed: 'normal' // 'fast' | 'normal' | 'slow'
+};
+
+let usedHeroesByFilter = {
+    all: new Set(),
+    tank: new Set(),
+    dps: new Set(),
+    healer: new Set()
+};
+
+let history = [];
+let searchQuery = '';
+
 // ============================================
 // ÉLÉMENTS DOM PRINCIPAUX
 // ============================================
@@ -94,6 +110,12 @@ const heroRoleBadge = document.getElementById('heroRoleBadge');
 const heroAnimation = document.getElementById('heroAnimation');
 const heroesGrid = document.getElementById('heroesGrid');
 const resultSection = document.getElementById('resultSection');
+// Nouveaux éléments UI
+const noRepeatToggle = document.getElementById('noRepeatToggle');
+const speedSelect = document.getElementById('speedSelect');
+const resetHistoryBtn = document.getElementById('resetHistoryBtn');
+const searchInput = document.getElementById('searchInput');
+const historyList = document.getElementById('historyList');
 
 // ============================================
 // INITIALISATION DE L'APPLICATION
@@ -103,6 +125,9 @@ document.addEventListener('DOMContentLoaded', function() {
     setupEventListeners();
     generateHeroesGrid();
     updateStats();
+    loadSettings();
+    applySettingsToUI();
+    renderHistory();
 });
 
 function initializeApp() {
@@ -129,6 +154,59 @@ function setupEventListeners() {
     
     // Raccourcis clavier
     document.addEventListener('keydown', handleKeyboard);
+
+    // Paramètres
+    if (noRepeatToggle) {
+        noRepeatToggle.addEventListener('change', () => {
+            settings.noRepeat = noRepeatToggle.checked;
+            saveSettings();
+        });
+    }
+    if (speedSelect) {
+        speedSelect.addEventListener('change', () => {
+            settings.speed = speedSelect.value;
+            saveSettings();
+        });
+    }
+    if (resetHistoryBtn) {
+        resetHistoryBtn.addEventListener('click', () => {
+            history = [];
+            usedHeroesByFilter = { all: new Set(), tank: new Set(), dps: new Set(), healer: new Set() };
+            renderHistory();
+            localStorage.removeItem('mr_history');
+        });
+    }
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
+            searchQuery = searchInput.value.trim().toLowerCase();
+            generateHeroesGrid();
+        });
+    }
+}
+
+// ============================================
+// PERSISTENCE DES PARAMÈTRES / HISTORIQUE
+// ============================================
+function loadSettings() {
+    try {
+        const saved = JSON.parse(localStorage.getItem('mr_settings') || '{}');
+        settings = { ...settings, ...saved };
+        const savedHistory = JSON.parse(localStorage.getItem('mr_history') || '[]');
+        if (Array.isArray(savedHistory)) history = savedHistory;
+    } catch (e) { console.warn('Settings load error', e); }
+}
+
+function saveSettings() {
+    localStorage.setItem('mr_settings', JSON.stringify(settings));
+}
+
+function saveHistory() {
+    localStorage.setItem('mr_history', JSON.stringify(history.slice(0, 20)));
+}
+
+function applySettingsToUI() {
+    if (noRepeatToggle) noRepeatToggle.checked = !!settings.noRepeat;
+    if (speedSelect) speedSelect.value = settings.speed || 'normal';
 }
 
 // Gestion des raccourcis clavier
@@ -188,7 +266,25 @@ function selectRandomHero() {
     animateRandomButton();
     
     // Obtenir la liste des héros selon le filtre
-    const availableHeroes = getFilteredHeroes();
+    let availableHeroes = getFilteredHeroes();
+    
+    // Appliquer la recherche
+    if (searchQuery) {
+        availableHeroes = availableHeroes.filter(h => h.name.toLowerCase().includes(searchQuery));
+    }
+    
+    // Appliquer l'option sans répétition
+    if (settings.noRepeat) {
+        const key = currentFilter === 'all' ? 'all' : currentFilter;
+        const used = usedHeroesByFilter[key];
+        const pool = availableHeroes.filter(h => !used.has(h.name));
+        if (pool.length > 0) {
+            availableHeroes = pool;
+        } else {
+            // Si tout a été utilisé, on réinitialise juste pour ce filtre
+            usedHeroesByFilter[key].clear();
+        }
+    }
     
     if (availableHeroes.length === 0) {
         console.warn('Aucun héros disponible pour le filtre sélectionné');
@@ -211,8 +307,10 @@ function startSuspenseAnimation(availableHeroes) {
     heroRoleBadge.style.opacity = '0';
     
     let animationStep = 0;
-    const totalSteps = 10; // Réduit de 15 à 10 changements
-    const baseDelay = 60; // Réduit de 80 à 60ms
+    const timings = getAnimationTimings();
+    const totalSteps = timings.totalSteps;
+    const baseDelay = timings.baseDelay;
+    const inc = timings.inc;
     
     function showRandomPreview() {
         if (animationStep < totalSteps) {
@@ -234,14 +332,14 @@ function startSuspenseAnimation(availableHeroes) {
             animationStep++;
             
             // Délai qui augmente progressivement pour créer le suspense
-            const delay = baseDelay + (animationStep * 40); // Réduit de 60 à 40ms
+            const delay = baseDelay + (animationStep * inc);
             setTimeout(showRandomPreview, delay);
             
         } else {
             // Animation terminée, choisir le vrai héros final
             setTimeout(() => {
                 revealFinalHero(availableHeroes);
-            }, 400); // Réduit de 800 à 400ms
+            }, timings.pauseDelay);
         }
     }
     
@@ -273,9 +371,22 @@ function revealFinalHero(availableHeroes) {
         // Nettoyer après l'animation
         setTimeout(() => {
             heroCard.classList.remove('final-reveal');
-        }, 600);
+        }, timings.revealDuration);
         
-    }, 300); // Réduit de 600 à 300ms
+    }, timings.finalDelay);
+}
+
+// Timings dynamiques selon la vitesse
+function getAnimationTimings() {
+    switch (settings.speed) {
+        case 'fast':
+            return { totalSteps: 8, baseDelay: 40, inc: 30, pauseDelay: 250, finalDelay: 200, revealDuration: 450 };
+        case 'slow':
+            return { totalSteps: 14, baseDelay: 80, inc: 60, pauseDelay: 600, finalDelay: 500, revealDuration: 900 };
+        case 'normal':
+        default:
+            return { totalSteps: 10, baseDelay: 60, inc: 40, pauseDelay: 400, finalDelay: 300, revealDuration: 600 };
+    }
 }
 
 // Animation simple du bouton
@@ -322,6 +433,9 @@ function displaySelectedHero(selectedHero) {
         
     }, 100);
     
+    // Enregistrer historique et répétitions
+    trackSelection(selectedHero);
+    renderHistory();
     // Mise en évidence dans la grille
     highlightHeroInGrid(selectedHero.name);
 }
@@ -396,7 +510,10 @@ function getTotalHeroesCount() {
 // GÉNÉRATION DE LA GRILLE DES HÉROS
 // ============================================
 function generateHeroesGrid() {
-    const filteredHeroes = getFilteredHeroes();
+    let filteredHeroes = getFilteredHeroes();
+    if (searchQuery) {
+        filteredHeroes = filteredHeroes.filter(h => h.name.toLowerCase().includes(searchQuery));
+    }
     heroesGrid.innerHTML = '';
     
     filteredHeroes.forEach(hero => {
@@ -415,6 +532,37 @@ function generateHeroesGrid() {
             card.style.opacity = '1';
             card.style.transform = 'translateY(0)';
         }, index * 30);
+    });
+}
+
+// ============================================
+// HISTORIQUE ET RÉPÉTITIONS
+// ============================================
+function trackSelection(hero) {
+    const role = getHeroRole(hero.name);
+    // Marquer comme utilisé si noRepeat
+    if (settings.noRepeat) {
+        const key = currentFilter === 'all' ? 'all' : role;
+        usedHeroesByFilter[key].add(hero.name);
+    }
+    // Ajouter à l'historique (début de tableau)
+    history.unshift({ name: hero.name, role, ts: Date.now() });
+    if (history.length > 20) history.length = 20;
+    saveHistory();
+}
+
+function renderHistory() {
+    if (!historyList) return;
+    historyList.innerHTML = '';
+    history.slice(0, 12).forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'flex items-center justify-between gap-2 px-3 py-2 rounded-md border text-white text-sm bg-[rgba(52,73,94,0.9)] border-[#566573]';
+        const badgeClass = item.role === 'tank' ? 'bg-[#2C3E50]' : item.role === 'dps' ? 'bg-[#C0392B]' : 'bg-[#16A085]';
+        div.innerHTML = `
+            <span class="truncate">${item.name}</span>
+            <span class="px-2 py-0.5 rounded text-xs ${badgeClass}">${roleConfig[item.role].name}</span>
+        `;
+        historyList.appendChild(div);
     });
 }
 
