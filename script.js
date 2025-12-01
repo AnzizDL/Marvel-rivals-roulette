@@ -28,6 +28,7 @@ const heroes = {
     "La Torche",
     "Iron Fist",
     "Iron Man",
+    "Jean-Luc",
     "Magik",
     "Mister Fantastic",
     "Moon Knight",
@@ -357,7 +358,7 @@ function startSuspenseAnimation(availableHeroes) {
     } else {
       // Animation terminée, choisir le vrai héros final
       setTimeout(() => {
-        revealFinalHero(availableHeroes,timings);
+        revealFinalHero(availableHeroes, timings);
       }, timings.pauseDelay);
     }
   }
@@ -367,7 +368,7 @@ function startSuspenseAnimation(availableHeroes) {
 }
 
 // Révélation finale dramatique
-function revealFinalHero(availableHeroes,timings) {
+function revealFinalHero(availableHeroes, timings) {
   const heroName = document.getElementById("heroName");
   const heroCard = document.getElementById("heroCard");
 
